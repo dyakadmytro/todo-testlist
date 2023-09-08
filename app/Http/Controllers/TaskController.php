@@ -36,7 +36,6 @@ class TaskController extends Controller
 
     public function storeTask(StoreTaskRequest $request, TaskList $task_list)
     {
-        dd(111);
         Task::create(array_merge($request->all(), ['user_id' => $this->user->id, 'task_list_id' => $task_list->id]));
         return response('Task created', 201);
     }

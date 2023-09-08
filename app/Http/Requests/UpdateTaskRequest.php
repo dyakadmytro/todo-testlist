@@ -35,7 +35,6 @@ class UpdateTaskRequest extends FormRequest
             ],
             'name' => 'required|string|max:32',
             'description' => 'nullable|string|max:255',
-            'status' => 'required|in:todo,done',
             'priority' => 'required|integer|between:1,5',
         ];
     }

@@ -68,7 +68,6 @@ class TaskControllerTest extends TestCase
             'name' => 'New Task',
             'parent' => $task->id,
             'description' => 'Task description',
-            'status' => 'todo',
             'priority' => 3,
         ]);
 
@@ -82,7 +81,6 @@ class TaskControllerTest extends TestCase
             'user_id' => $user->id,
             'task_list_id' => $taskList->id,
             'description' => 'Task description',
-            'status' => 'todo',
             'priority' => 3,
         ]);
     }
@@ -121,7 +119,6 @@ class TaskControllerTest extends TestCase
         $response = $this->put("/api/tasks/{$task->id}", [
             'name' => 'Updated Task Name',
             'description' => 'Updated Task Description',
-            'status' => 'done',
             'priority' => 5,
         ]);
 
@@ -133,7 +130,6 @@ class TaskControllerTest extends TestCase
             'id' => $task->id,
             'name' => 'Updated Task Name',
             'description' => 'Updated Task Description',
-            'status' => 'done',
             'priority' => 5,
         ]);
     }
