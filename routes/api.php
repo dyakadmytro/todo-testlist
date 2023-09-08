@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use \App\Http\Controllers\TaskListController;
+use \App\Http\Controllers\TaskController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,4 +34,7 @@ Route::prefix('user')->middleware('auth:sanctum')->group(function () {
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::resource('task-list', TaskListController::class)->except(['create', 'edit']);
+    Route::get('task-list/{task_list}/tasks', [TaskController::class, 'listTasks']);
+    Route::post('task-list/{task_list}/tasks', [TaskController::class, 'storeTask']);
+    Route::resource('tasks', TaskController::class)->except([ 'store', 'create', 'edit']);
 });

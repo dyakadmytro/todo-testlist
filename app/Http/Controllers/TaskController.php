@@ -5,23 +5,40 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreTaskRequest;
 use App\Http\Requests\UpdateTaskRequest;
 use App\Models\Task;
+use App\Models\TaskList;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 class TaskController extends Controller
 {
+    protected User $user;
+
+    public function __construct()
+    {
+        /**
+         * @var User $user
+         */
+        $user = Auth::user();
+        $this->user = $user;
+    }
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
+        return response()->json($this->user->tasks);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreTaskRequest $request)
+    public function listTasks(TaskList $task_list)
     {
-        //
+        return response()->json($task_list->tasks);
+    }
+
+    public function storeTask(StoreTaskRequest $request, TaskList $task_list)
+    {
+        dd(111);
+        Task::create(array_merge($request->all(), ['user_id' => $this->user->id, 'task_list_id' => $task_list->id]));
+        return response('Task created', 201);
     }
 
     /**
@@ -29,7 +46,8 @@ class TaskController extends Controller
      */
     public function show(Task $task)
     {
-        //
+        $this->authorize('view', $task);
+        return response()->json($task);
     }
 
     /**
@@ -37,7 +55,8 @@ class TaskController extends Controller
      */
     public function update(UpdateTaskRequest $request, Task $task)
     {
-        //
+        $task->update($request->all());
+        return response('Task updated', 200);
     }
 
     /**
@@ -45,6 +64,7 @@ class TaskController extends Controller
      */
     public function destroy(Task $task)
     {
-        //
+        $task->delete();
+        return response('Task deleted', 200);
     }
 }

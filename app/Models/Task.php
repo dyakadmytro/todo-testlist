@@ -11,8 +11,16 @@ class Task extends Model
 
     const UPDATED_AT = null;
 
-    public $timestamps = [
-        'created_at',
-        'completed_at'
+    protected $fillable = [
+        'user_id', 'task_list_id', 'parent', 'name', 'description', 'status', 'priority', 'completed_at'
     ];
+
+    public function taskList()
+    {
+        return $this->belongsTo(TaskList::class);
+    }
+
+    public function user() {
+        return $this->belongsTo(User::class);
+    }
 }
