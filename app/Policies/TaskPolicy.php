@@ -29,6 +29,13 @@ class TaskPolicy
         return $taskList->user->id === $user->id;
     }
 
+    public function allowToDone(User $user, Task $task): bool
+    {
+        return $task->childs->every(function ($item) {
+            return $item->status === 'done';
+        });
+    }
+
     /**
      * Determine whether the user can update the model.
      */

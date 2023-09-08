@@ -134,6 +134,30 @@ class TaskControllerTest extends TestCase
         ]);
     }
 
+    public function testUpdateStatusNotAllowed()
+    {
+        // Create a user and a task
+        $user = User::factory()->create();
+        $taskList = TaskList::factory()->create(['user_id' => $user->id]);
+        $task = Task::factory()->create(['user_id' => $user->id, 'task_list_id' => $taskList->id]);
+        $task1 = Task::factory()->create(['user_id' => $user->id,'status' => 'todo', 'task_list_id' => $taskList->id, 'parent' => $task->id]);
+        $task2 = Task::factory()->create(['user_id' => $user->id,'status' => 'todo', 'task_list_id' => $taskList->id, 'parent' => $task->id]);
+
+        // Authenticate the user
+        $this->actingAs($user);
+
+        // Send a PUT request to the update action with updated task data
+        $response = $this->put("/api/tasks/{$task->id}", [
+            'name' => 'Updated Task Name',
+            'description' => 'Updated Task Description',
+            'priority' => 5,
+            'status' => 'done',
+        ]);
+
+        // Assert that the response status is 200
+        $response->assertStatus(302);
+    }
+
     public function testDestroy()
     {
         // Create a user and a task
