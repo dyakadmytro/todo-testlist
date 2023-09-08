@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('tasks', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(\App\Models\User::class);
-            $table->foreignIdFor(\App\Models\Tasklist::class);
+            $table->foreignIdFor(\App\Models\TaskList::class);
+            $table->foreignIdFor(\App\Models\Task::class, 'parent')->nullable();
             $table->string('name', 32);
             $table->tinyText('description')->nullable();
             $table->enum('status', ['todo', 'done']);
