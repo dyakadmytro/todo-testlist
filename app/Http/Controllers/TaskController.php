@@ -2,41 +2,42 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CheckTaskRequest;
+use App\Http\Requests\GetTasksRequest;
 use App\Http\Requests\StoreTaskRequest;
 use App\Http\Requests\UpdateTaskRequest;
 use App\Models\Task;
 use App\Models\TaskList;
-use App\Models\User;
+use App\Services\TaskFilterService;
 use Illuminate\Support\Facades\Auth;
 
 class TaskController extends Controller
 {
-    protected User $user;
-
     public function __construct()
     {
-        /**
-         * @var User $user
-         */
-        $user = Auth::user();
-        $this->user = $user;
+        $this->authorizeResource(Task::class, 'task');
     }
+
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(GetTasksRequest $request)
     {
-        return response()->json($this->user->tasks);
+        $query = Auth::user()->tasks()->getQuery();
+        TaskFilterService::build($request, $query);
+        return response()->json($query->get());
     }
 
-    public function listTasks(TaskList $task_list)
+    public function listTasks(GetTasksRequest $request, TaskList $task_list)
     {
-        return response()->json($task_list->tasks);
+        $query = $task_list->tasks()->getQuery();
+        TaskFilterService::build($request, $query);
+        return response()->json($query->get());
     }
 
-    public function storeTask(StoreTaskRequest $request, TaskList $task_list)
+    public function store(StoreTaskRequest $request)
     {
-        Task::create(array_merge($request->all(), ['user_id' => $this->user->id, 'task_list_id' => $task_list->id]));
+        Task::create(array_merge($request->only(['parent', 'title', 'description', 'task_list_id', 'priority']), ['user_id' => Auth::user()->id]));
         return response('Task created', 201);
     }
 
@@ -45,7 +46,6 @@ class TaskController extends Controller
      */
     public function show(Task $task)
     {
-        $this->authorize('view', $task);
         return response()->json($task);
     }
 
@@ -54,8 +54,14 @@ class TaskController extends Controller
      */
     public function update(UpdateTaskRequest $request, Task $task)
     {
-        $task->update($request->all());
+        $task->update($request->only(['parent', 'title', 'description', 'task_list_id', 'priority']));
         return response('Task updated', 200);
+    }
+
+    public function checkTask(CheckTaskRequest $request, Task $task)
+    {
+        $task->update(['status' => 'done']);
+        return response('The task set done', 200);
     }
 
     /**

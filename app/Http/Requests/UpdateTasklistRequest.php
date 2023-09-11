@@ -22,7 +22,7 @@ class UpdateTasklistRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:32'
+            'title' => 'required|string|max:32'
         ];
     }
 }

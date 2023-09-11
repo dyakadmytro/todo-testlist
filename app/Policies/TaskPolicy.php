@@ -3,7 +3,6 @@
 namespace App\Policies;
 
 use App\Models\Task;
-use App\Models\TaskList;
 use App\Models\User;
 
 class TaskPolicy
@@ -24,14 +23,14 @@ class TaskPolicy
         return $task->user->id === $user->id;
     }
 
-    public function createTask(User $user, TaskList $taskList): bool
+    public function create(User $user): bool
     {
-        return $taskList->user->id === $user->id;
+        return true;
     }
 
     public function allowToDone(User $user, Task $task): bool
     {
-        return $task->childs->every(function ($item) {
+        return $task->user->id === $user->id && $task->childs->every(function ($item) {
             return $item->status === 'done';
         });
     }
@@ -49,6 +48,6 @@ class TaskPolicy
      */
     public function delete(User $user, Task $task): bool
     {
-        return $task->user->id === $user->id;
+        return $task->user->id === $user->id && $task->status != 'done';
     }
 }

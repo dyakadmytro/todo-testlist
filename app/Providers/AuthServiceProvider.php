@@ -27,6 +27,7 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $this->registerPolicies();
         Gate::define('allowToDone', [TaskPolicy::class, 'allowToDone']);
     }
 }

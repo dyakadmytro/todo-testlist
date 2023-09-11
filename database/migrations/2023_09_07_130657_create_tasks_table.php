@@ -16,12 +16,14 @@ return new class extends Migration
             $table->foreignIdFor(\App\Models\User::class);
             $table->foreignIdFor(\App\Models\TaskList::class);
             $table->foreignIdFor(\App\Models\Task::class, 'parent')->nullable();
-            $table->string('name', 32);
+            $table->string('title', 32);
             $table->tinyText('description')->nullable();
             $table->enum('status', ['todo', 'done']);
             $table->smallInteger('priority')->unsigned()->default(1);
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('completed_at')->nullable();
+
+            $table->fullText(['title', 'description'], 'task_fulltext');
         });
     }
 

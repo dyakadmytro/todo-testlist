@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use App\Models\Task;
+use App\Rules\ParentAccessRule;
+use App\Rules\TaskListAccessRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
 
@@ -27,13 +29,15 @@ class StoreTaskRequest extends FormRequest
             'parent' => [
                 'nullable',
                 'exists:tasks,id',
-                function (string $attribute, mixed $value, \Closure $fail) {
-                    if (Gate::denies('view', Task::findOrFail(intval($value)))) {
-                        $fail("You can`t attach task to this parent task id: {$value}");
-                    }
-                },
+                new ParentAccessRule()
             ],
-            'name' => 'required|string|max:32',
+            'title' => 'required|string|max:32',
+            'task_list_id' => [
+                'required',
+                'integer',
+                'exists:task_lists,id',
+                new TaskListAccessRule()
+            ],
             'description' => 'nullable|string|max:255',
             'priority' => 'required|integer|between:1,5',
         ];

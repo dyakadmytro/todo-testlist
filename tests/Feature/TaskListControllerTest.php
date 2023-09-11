@@ -4,7 +4,6 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use App\Models\TaskList;
 
@@ -16,14 +15,14 @@ class TaskListControllerTest extends TestCase
     {
         // Create a user and some task lists
         $user = User::factory()->create();
-        $taskList1 = TaskList::factory()->create(['user_id' => $user->id, 'name' => 'List 1']);
-        $taskList2 = TaskList::factory()->create(['user_id' => $user->id, 'name' => 'List 2']);
+        $taskList1 = TaskList::factory()->create(['user_id' => $user->id, 'title' => 'List 1']);
+        $taskList2 = TaskList::factory()->create(['user_id' => $user->id, 'title' => 'List 2']);
 
         // Authenticate the user
         $this->actingAs($user);
 
         // Send a GET request to the index action
-        $response = $this->get('/api/task-list');
+        $response = $this->get('/api/user/task-list');
 
         // Assert that the response status is 200
         $response->assertStatus(200);
@@ -41,8 +40,8 @@ class TaskListControllerTest extends TestCase
         $this->actingAs($user);
 
         // Send a POST request to the store action with task list data
-        $response = $this->post('/api/task-list', [
-            'name' => 'New Task List',
+        $response = $this->post('/api/user/task-list', [
+            'title' => 'New Task List',
         ]);
 
         // Assert that the response status is 201 (created)
@@ -50,7 +49,7 @@ class TaskListControllerTest extends TestCase
 
         // Assert that the task list has been created in the database
         $this->assertDatabaseHas('task_lists', [
-            'name' => 'New Task List',
+            'title' => 'New Task List',
             'user_id' => $user->id,
         ]);
     }
@@ -59,13 +58,13 @@ class TaskListControllerTest extends TestCase
     {
         // Create a user and a task list
         $user = User::factory()->create();
-        $taskList = TaskList::factory()->create(['user_id' => $user->id, 'name' => 'Task list test']);
+        $taskList = TaskList::factory()->create(['user_id' => $user->id, 'title' => 'Task list test']);
 
         // Authenticate the user
         $this->actingAs($user);
 
         // Send a GET request to the show action with the task list ID
-        $response = $this->get("/api/task-list/{$taskList->id}");
+        $response = $this->get("/api/user/task-list/{$taskList->id}");
 
         // Assert that the response status is 200
         $response->assertStatus(200);
@@ -78,14 +77,14 @@ class TaskListControllerTest extends TestCase
     {
         // Create a user and a task list
         $user = User::factory()->create();
-        $taskList = TaskList::factory()->create(['user_id' => $user->id, 'name' => 'Task list test']);
+        $taskList = TaskList::factory()->create(['user_id' => $user->id, 'title' => 'Task list test']);
 
         // Authenticate the user
         $this->actingAs($user);
 
         // Send a PUT request to the update action with updated task list data
-        $response = $this->put("/api/task-list/{$taskList->id}", [
-            'name' => 'Updated Task List Name',
+        $response = $this->put("/api/user/task-list/{$taskList->id}", [
+            'title' => 'Updated Task List Name',
         ]);
 
         // Assert that the response status is 200
@@ -94,7 +93,7 @@ class TaskListControllerTest extends TestCase
         // Assert that the task list has been updated in the database
         $this->assertDatabaseHas('task_lists', [
             'id' => $taskList->id,
-            'name' => 'Updated Task List Name',
+            'title' => 'Updated Task List Name',
         ]);
     }
 
@@ -102,13 +101,13 @@ class TaskListControllerTest extends TestCase
     {
         // Create a user and a task list
         $user = User::factory()->create();
-        $taskList = TaskList::factory()->create(['user_id' => $user->id, 'name' => 'Task list test']);
+        $taskList = TaskList::factory()->create(['user_id' => $user->id, 'title' => 'Task list test']);
 
         // Authenticate the user
         $this->actingAs($user);
 
         // Send a DELETE request to the destroy action with the task list ID
-        $response = $this->delete("/api/task-list/{$taskList->id}");
+        $response = $this->delete("/api/user/task-list/{$taskList->id}");
 
         // Assert that the response status is 200
         $response->assertStatus(200);

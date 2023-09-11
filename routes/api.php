@@ -20,21 +20,10 @@ use \App\Http\Controllers\TaskController;
 Route::post('/user/login', [AuthController::class, 'login'])->name('login');
 
 Route::prefix('user')->middleware('auth:sanctum')->group(function () {
-    Route::get('data', function (Request $request) {
-        return response()->json($request->user());
-    });
-    Route::post('logout', function (Request $request) {
-        $request->user()->tokens()->delete();
-
-        return response()->json([
-            'message' => 'Successfully logged out'
-        ]);
-    });
-});
-
-Route::middleware('auth:sanctum')->group(function () {
+    Route::post('logout', [AuthController::class, 'logout']);
+    Route::resource('tasks', TaskController::class)->except(['create', 'edit']);
     Route::resource('task-list', TaskListController::class)->except(['create', 'edit']);
     Route::get('task-list/{task_list}/tasks', [TaskController::class, 'listTasks']);
-    Route::post('task-list/{task_list}/tasks', [TaskController::class, 'storeTask']);
-    Route::resource('tasks', TaskController::class)->except([ 'store', 'create', 'edit']);
+    Route::patch('tasks/{task}/check', [TaskController::class, 'checkTask']);
 });
+

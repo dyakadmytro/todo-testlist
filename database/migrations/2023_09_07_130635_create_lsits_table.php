@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('task_lists', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 32);
+            $table->string('title', 32);
             $table->foreignIdFor(\App\Models\User::class);
             $table->timestamps();
         });

@@ -12,15 +12,9 @@ use Illuminate\Support\Facades\Auth;
 
 class TaskListController extends Controller
 {
-    protected User $user;
-
     public function __construct()
     {
-        /**
-         * @var User $user
-         */
-        $user = Auth::user();
-        $this->user = $user;
+        $this->authorizeResource(TaskList::class, 'taskList');
     }
 
     /**
@@ -28,7 +22,7 @@ class TaskListController extends Controller
      */
     public function index()
     {
-        return response()->json($this->user->taskLists);
+        return response()->json(Auth::user()->taskLists);
     }
 
     /**
@@ -36,7 +30,7 @@ class TaskListController extends Controller
      */
     public function store(StoreTasklistRequest $request)
     {
-        TaskList::create(array_merge($request->all(), ['user_id' => $this->user->id]));
+        TaskList::create(array_merge($request->only(['title']), ['user_id' => Auth::user()->id]));
         return response('TaskList created', 201);
     }
 
@@ -53,7 +47,7 @@ class TaskListController extends Controller
      */
     public function update(UpdateTasklistRequest $request, TaskList $taskList)
     {
-        $taskList->update($request->all());
+        $taskList->update($request->only(['title']));
         return response('TaskList updated', 200);
     }
 

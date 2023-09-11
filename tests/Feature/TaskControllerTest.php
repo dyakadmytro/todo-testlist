@@ -24,7 +24,7 @@ class TaskControllerTest extends TestCase
         $this->actingAs($user);
 
         // Send a GET request to the index action
-        $response = $this->get('/api/tasks');
+        $response = $this->get('/api/user/tasks');
 
         // Assert that the response status is 200
         $response->assertStatus(200);
@@ -44,7 +44,7 @@ class TaskControllerTest extends TestCase
         $this->actingAs($user);
 
         // Send a GET request to the listTasks action
-        $response = $this->get("/api/task-list/{$taskList->id}/tasks");
+        $response = $this->get("/api/user/task-list/{$taskList->id}/tasks");
 
         // Assert that the response status is 200
         $response->assertStatus(200);
@@ -64,9 +64,10 @@ class TaskControllerTest extends TestCase
         $this->actingAs($user);
 
         // Send a POST request to the storeTask action with task data
-        $response = $this->post("/api/task-list/{$taskList->id}/tasks", [
-            'name' => 'New Task',
+        $response = $this->post("/api/user/tasks", [
+            'title' => 'New Task',
             'parent' => $task->id,
+            'task_list_id' => $taskList->id,
             'description' => 'Task description',
             'priority' => 3,
         ]);
@@ -76,7 +77,7 @@ class TaskControllerTest extends TestCase
 
         // Assert that the task has been created in the database
         $this->assertDatabaseHas('tasks', [
-            'name' => 'New Task',
+            'title' => 'New Task',
             'parent' => $task->id,
             'user_id' => $user->id,
             'task_list_id' => $taskList->id,
@@ -96,7 +97,7 @@ class TaskControllerTest extends TestCase
         $this->actingAs($user);
 
         // Send a GET request to the show action with the task ID
-        $response = $this->get("/api/tasks/{$task->id}");
+        $response = $this->get("/api/user/tasks/{$task->id}");
 
         // Assert that the response status is 200
         $response->assertStatus(200);
@@ -116,9 +117,10 @@ class TaskControllerTest extends TestCase
         $this->actingAs($user);
 
         // Send a PUT request to the update action with updated task data
-        $response = $this->put("/api/tasks/{$task->id}", [
-            'name' => 'Updated Task Name',
+        $response = $this->put("/api/user/tasks/{$task->id}", [
+            'title' => 'Updated Task Name',
             'description' => 'Updated Task Description',
+            'task_list_id' => $taskList->id,
             'priority' => 5,
         ]);
 
@@ -128,7 +130,7 @@ class TaskControllerTest extends TestCase
         // Assert that the task has been updated in the database
         $this->assertDatabaseHas('tasks', [
             'id' => $task->id,
-            'name' => 'Updated Task Name',
+            'title' => 'Updated Task Name',
             'description' => 'Updated Task Description',
             'priority' => 5,
         ]);
@@ -140,15 +142,14 @@ class TaskControllerTest extends TestCase
         $user = User::factory()->create();
         $taskList = TaskList::factory()->create(['user_id' => $user->id]);
         $task = Task::factory()->create(['user_id' => $user->id, 'task_list_id' => $taskList->id]);
-        $task1 = Task::factory()->create(['user_id' => $user->id,'status' => 'todo', 'task_list_id' => $taskList->id, 'parent' => $task->id]);
-        $task2 = Task::factory()->create(['user_id' => $user->id,'status' => 'todo', 'task_list_id' => $taskList->id, 'parent' => $task->id]);
+        Task::factory(2)->create(['user_id' => $user->id,'status' => 'todo', 'task_list_id' => $taskList->id, 'parent' => $task->id]);
 
         // Authenticate the user
         $this->actingAs($user);
 
         // Send a PUT request to the update action with updated task data
-        $response = $this->put("/api/tasks/{$task->id}", [
-            'name' => 'Updated Task Name',
+        $response = $this->put("/api/user/tasks/{$task->id}", [
+            'title' => 'Updated Task Name',
             'description' => 'Updated Task Description',
             'priority' => 5,
             'status' => 'done',
@@ -169,7 +170,7 @@ class TaskControllerTest extends TestCase
         $this->actingAs($user);
 
         // Send a DELETE request to the destroy action with the task ID
-        $response = $this->delete("/api/tasks/{$task->id}");
+        $response = $this->delete("/api/user/tasks/{$task->id}");
 
         // Assert that the response status is 200
         $response->assertStatus(200);
@@ -192,7 +193,7 @@ class TaskControllerTest extends TestCase
         $this->actingAs($user2);
 
         // Attempt to access the task owned by user1
-        $response = $this->get("/api/tasks/{$task->id}");
+        $response = $this->get("/api/user/tasks/{$task->id}");
 
         // Assert that the response status is 403 (Forbidden)
         $response->assertStatus(403);

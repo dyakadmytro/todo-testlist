@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use App\Models\Task;
+use App\Rules\ParentAccessRule;
+use App\Rules\TaskListAccessRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
 
@@ -25,27 +27,22 @@ class UpdateTaskRequest extends FormRequest
     {
         return [
             'parent' => [
-                'nullable',
                 'exists:tasks,id',
+                new ParentAccessRule(),
                 function (string $attribute, mixed $value, \Closure $fail) {
-                    if (Gate::denies('view', Task::firstOrfail(intval($value)))) {
-                        $fail("You can`t attach task to this parent task id: {$value}");
+                    if ($this->route('task')->id == $value) {
+                        $fail("Task can`t be parent for itself");
                     }
                 },
             ],
-            'name' => 'required|string|max:32',
-            'description' => 'nullable|string|max:255',
-            'status' => [
-                'nullable',
-                'in:todo,done',
-                function (string $attribute, mixed $value, \Closure $fail) {
-
-                    if (Gate::denies('allowToDone', $this->route('task'))) {
-                        $fail("You can`t done task if it has undone child tasks");
-                    }
-                },
+            'title' => 'string|max:32',
+            'description' => 'string|max:255',
+            'task_list_id' => [
+                'integer',
+                'exists:task_lists,id',
+                new TaskListAccessRule()
             ],
-            'priority' => 'required|integer|between:1,5',
+            'priority' => 'integer|between:1,5',
         ];
     }
 }
